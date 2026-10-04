@@ -2,4 +2,7 @@ import { register } from 'tsx/esm/api';
 
 register();
 process.env.NODE_ENV ??= 'production';
-await import('./server.ts');
+void import('./server.ts').catch((error) => {
+  console.error('Failed to start FitPulse server:', error);
+  process.exit(1);
+});
