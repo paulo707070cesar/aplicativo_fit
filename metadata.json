@@ -1,0 +1,6 @@
+{
+  "name": "FitPulse - Gestão de Alunos, Treinos & Cobranças",
+  "description": "Plataforma completa para personal trainers e academias: prescrição de treinos, modo ao vivo, gestão de alunos, comparativos visuais e cobranças Pix automáticas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
