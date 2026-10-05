@@ -19,6 +19,7 @@ import { AiCoachModal } from './components/views/AiCoachModal';
 import { AiHubView } from './components/views/AiHubView';
 import { Sidebar } from './components/Sidebar';
 import { LoginView } from './components/views/LoginView';
+import { LandingPage } from './components/LandingPage';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
@@ -36,6 +37,8 @@ export default function App() {
   const [isHostingerModalOpen, setIsHostingerModalOpen] = useState(false);
   const [isImageLinksModalOpen, setIsImageLinksModalOpen] = useState(false);
   const [isAiCoachModalOpen, setIsAiCoachModalOpen] = useState(false);
+
+  if (window.location.pathname.replaceAll('/', '') === 'landing') return <LandingPage />;
 
   if (!isAuthenticated) {
     return (
