@@ -14,6 +14,25 @@ export const LiveWorkoutView: React.FC<LiveWorkoutViewProps> = ({ onNavigate }) 
   const [isSet3Completed, setIsSet3Completed] = useState(false);
   const [showToast, setShowToast] = useState<string | null>(null);
 
+  // Video Demo Modal State
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [videoUrlInput, setVideoUrlInput] = useState('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+  const [activeVideoUrl, setActiveVideoUrl] = useState('https://www.youtube.com/embed/dQw4w9WgXcQ');
+
+  const handleSaveVideoUrl = (e: React.FormEvent) => {
+    e.preventDefault();
+    let finalUrl = videoUrlInput.trim();
+    if (finalUrl.includes('youtube.com') || finalUrl.includes('youtu.be')) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+      const match = finalUrl.match(regExp);
+      const videoId = match && match[2].length === 11 ? match[2] : 'dQw4w9WgXcQ';
+      finalUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    }
+    setActiveVideoUrl(finalUrl);
+    setShowToast('Vídeo de demonstração atualizado com sucesso!');
+    setTimeout(() => setShowToast(null), 3000);
+  };
+
   const totalRest = 90;
   const circumference = 188.4;
   const strokeOffset = circumference - (secondsRemaining / totalRest) * circumference;
@@ -104,8 +123,8 @@ export const LiveWorkoutView: React.FC<LiveWorkoutViewProps> = ({ onNavigate }) 
           {/* Video Demonstration Badge */}
           <button
             type="button"
-            onClick={() => alert('Reproduzindo vídeo: Instruções de alinhamento lombar e joelhos no Stiff')}
-            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#141b2b]/60 backdrop-blur-md text-white text-[11px] font-bold active:scale-95 transition-transform shadow-md cursor-pointer"
+            onClick={() => setIsVideoModalOpen(true)}
+            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#141b2b]/80 backdrop-blur-md text-white text-[11px] font-bold active:scale-95 transition-transform shadow-md cursor-pointer hover:bg-[#141b2b]"
           >
             <span className="material-symbols-outlined text-[16px] text-[#7ffc97]">play_circle</span>
             <span>Demonstração em Vídeo</span>
@@ -444,6 +463,88 @@ export const LiveWorkoutView: React.FC<LiveWorkoutViewProps> = ({ onNavigate }) 
           </button>
         </div>
       </div>
+
+      {/* Video Demonstration Modal (YouTube / MP4) */}
+      {isVideoModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in-50 duration-200">
+          <div className="w-full max-w-xl bg-white rounded-3xl p-5 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-[#e9edff] pb-3 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#006b2c] text-white flex items-center justify-center font-bold">
+                  <span className="material-symbols-outlined text-[20px]">smart_display</span>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#141b2b]">Demonstração em Vídeo</h3>
+                  <p className="text-[11px] text-[#6e7b6c]">Stiff com Halteres / RDL • Execução & Postura</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsVideoModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-[#f1f3ff] hover:bg-[#e9edff] flex items-center justify-center text-[#3e4a3d] cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
+
+            {/* Video Player Container */}
+            <div className="py-3 flex flex-col gap-3">
+              <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-inner">
+                {activeVideoUrl.includes('embed') || activeVideoUrl.includes('youtube') ? (
+                  <iframe
+                    src={activeVideoUrl}
+                    title="Demonstração do Exercício"
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <video
+                    src={activeVideoUrl}
+                    controls
+                    autoPlay
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
+
+              {/* URL Customizer Form */}
+              <form onSubmit={handleSaveVideoUrl} className="flex flex-col gap-2 pt-1">
+                <label className="text-[11px] font-bold text-[#6e7b6c]">
+                  Alterar Link do Vídeo (YouTube ou URL de Vídeo MP4):
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={videoUrlInput}
+                    onChange={(e) => setVideoUrlInput(e.target.value)}
+                    placeholder="Ex: https://www.youtube.com/watch?v=..."
+                    className="flex-1 h-10 px-3.5 rounded-xl bg-[#f1f3ff] text-[#141b2b] text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#006b2c]/20"
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 h-10 bg-[#006b2c] hover:bg-[#00873a] text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer"
+                  >
+                    Carregar Vídeo
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t border-[#e9edff] pt-3 flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsVideoModalOpen(false)}
+                className="px-4 py-2 bg-[#f1f3ff] hover:bg-[#e9edff] text-[#141b2b] font-bold text-xs rounded-xl cursor-pointer"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

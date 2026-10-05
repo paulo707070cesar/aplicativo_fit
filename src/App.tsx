@@ -18,8 +18,13 @@ import { ImageLinksModal } from './components/views/ImageLinksModal';
 import { AiCoachModal } from './components/views/AiCoachModal';
 import { AiHubView } from './components/views/AiHubView';
 import { Sidebar } from './components/Sidebar';
+import { LoginView } from './components/views/LoginView';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [currentUserRole, setCurrentUserRole] = useState<'coach' | 'aluno'>('coach');
+  const [currentUserName, setCurrentUserName] = useState<string>('Carlos Rossi');
+
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [alunos, setAlunos] = useState<Aluno[]>(INITIAL_ALUNOS);
   const [selectedAluno, setSelectedAluno] = useState<Aluno>(INITIAL_ALUNOS[0]);
@@ -32,8 +37,33 @@ export default function App() {
   const [isImageLinksModalOpen, setIsImageLinksModalOpen] = useState(false);
   const [isAiCoachModalOpen, setIsAiCoachModalOpen] = useState(false);
 
+  if (!isAuthenticated) {
+    return (
+      <LoginView
+        onLoginSuccess={(role, name) => {
+          setCurrentUserRole(role);
+          setCurrentUserName(name);
+          setIsAuthenticated(true);
+          if (role === 'aluno') {
+            setCurrentView('perfil-aluno');
+          } else {
+            setCurrentView('dashboard');
+          }
+        }}
+      />
+    );
+  }
+
   const handleNavigate = (view: string) => {
-    setCurrentView(view);
+    if (currentUserRole === 'aluno') {
+      if (['financeiro', 'clientes', 'novo-treino', 'ai-hub', 'config-ia'].includes(view)) {
+        setCurrentView('perfil-aluno');
+      } else {
+        setCurrentView(view);
+      }
+    } else {
+      setCurrentView(view);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -69,6 +99,8 @@ export default function App() {
         currentView={currentView}
         onNavigate={handleNavigate}
         onOpenAiModal={() => setIsAiCoachModalOpen(true)}
+        onLogout={() => setIsAuthenticated(false)}
+        userRole={currentUserRole}
       />
 
       {/* Main Content Area (dynamically adapts width when sidebar is collapsed or expanded) */}
